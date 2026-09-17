@@ -1,7 +1,7 @@
 import pandas as pd
 import pickle
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
-
 from features import create_features
 
 df = pd.read_csv("sales.csv")
@@ -35,7 +35,6 @@ lag_7 = df.iloc[-7]["sales"]
 last_date = last_row["date"]
 
 for i in range(1, 8):
-
     future_date = last_date + pd.Timedelta(days=i)
 
     new_data = pd.DataFrame([{
@@ -57,3 +56,33 @@ print("\nNext 7 Days Prediction:")
 
 for i, prediction in enumerate(predictions, 1):
     print("Day", i, ":", round(prediction, 2))
+
+
+# Create forecast graph
+
+future_dates = [
+    last_date + pd.Timedelta(days=i)
+    for i in range(1, 8)
+]
+
+plt.figure(figsize=(10, 5))
+
+plt.plot(
+    future_dates,
+    predictions,
+    marker="o"
+)
+
+plt.title("Next 7 Days Demand Forecast")
+plt.xlabel("Date")
+plt.ylabel("Predicted Sales")
+plt.xticks(rotation=45)
+plt.grid(True)
+
+plt.tight_layout()
+
+plt.savefig("forecast.png")
+
+plt.show()
+
+print("\nForecast graph saved as forecast.png")

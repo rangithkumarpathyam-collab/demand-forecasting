@@ -1,8 +1,8 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
-
 from features import create_features
 
 df = pd.read_csv("sales.csv")
@@ -44,3 +44,39 @@ print("----------------")
 print("MAE :", round(mae, 2))
 print("RMSE:", round(rmse, 2))
 print("MAPE:", round(mape, 2), "%")
+
+
+# Actual vs Predicted graph
+
+test_dates = df["date"].iloc[split:]
+
+plt.figure(figsize=(10, 5))
+
+plt.plot(
+    test_dates,
+    y_test,
+    marker="o",
+    label="Actual"
+)
+
+plt.plot(
+    test_dates,
+    predictions,
+    marker="o",
+    label="Predicted"
+)
+
+plt.title("Actual vs Predicted Sales")
+plt.xlabel("Date")
+plt.ylabel("Sales")
+plt.legend()
+plt.xticks(rotation=45)
+plt.grid(True)
+
+plt.tight_layout()
+
+plt.savefig("actual_vs_predicted.png")
+
+plt.show()
+
+print("\nActual vs Predicted graph saved as actual_vs_predicted.png")
