@@ -1,89 +1,87 @@
-from visualization import (
-    sales_trend,
-    product_sales,
-    promotion_sales,
-    price_sales
-)
-from data_loader import load_sales_data
+import pandas as pd
 
-from data_cleaning import (
-    clean_sales_data,
-    aggregate_daily_sales,
-    aggregate_monthly_sales
+from src.time_series import (
+    prepare_time_series,
+    resample_sales,
+    calculate_moving_average
 )
 
-from sales_analysis import (
-    total_sales,
-    average_demand,
-    best_selling_products,
-    sales_by_product,
-    promotion_analysis,
-    price_analysis
+from src.trend_seasonality import (
+    detect_trend,
+    detect_weekly_seasonality
 )
 
+from src.anomaly_detection import (
+    detect_anomalies
+)
 
-# 1. Load sales data
-df = load_sales_data("sales_data.csv")
+from src.forecast import forecast_demand
 
+from src.visualization import plot_forecast
 
-# 2. Clean the data
-df = clean_sales_data(df)
+# Load data
+df = pd.read_csv("data/sales.csv")
 
+print("=" * 50)
+print("DEMAND FORECASTING SYSTEM")
+print("=" * 50)
 
-# 3. Display cleaned data
-print("\n===== CLEANED SALES DATA =====")
+# Prepare time series
+df = prepare_time_series(df)
+
+print("\nPrepared Data:")
 print(df)
 
+# Daily sales
+daily_sales = resample_sales(df, "D")
 
-# 4. Historical sales analysis
-print("\n===== SALES SUMMARY =====")
+print("\nDaily Sales:")
+print(daily_sales)
 
-print("Total Sales:", total_sales(df))
+# Weekly sales
+weekly_sales = resample_sales(df, "W")
 
-print("Average Demand:", round(average_demand(df), 2))
+print("\nWeekly Sales:")
+print(weekly_sales)
 
+# Moving average
+moving_average = calculate_moving_average(daily_sales, window=7)
 
-# 5. Best-selling products
-print("\n===== BEST-SELLING PRODUCTS =====")
-print(best_selling_products(df))
+print("\n7-Day Moving Average:")
+print(moving_average)
 
+# Trend detection
+trend_result = detect_trend(daily_sales)
 
-# 6. Daily sales
-daily = aggregate_daily_sales(df)
+print("\nTrend Result:")
+print(trend_result)
 
-print("\n===== DAILY SALES =====")
-print(daily)
+# Seasonality detection
+seasonality_result = detect_weekly_seasonality(daily_sales)
 
+print("\nSeasonality Result:")
+print(seasonality_result)
 
-# 7. Monthly sales
-monthly = aggregate_monthly_sales(df)
+# Anomaly detection
+anomaly_result = detect_anomalies(daily_sales)
 
-print("\n===== MONTHLY SALES =====")
-print(monthly)
+print("\nAnomaly Detection:")
+print(anomaly_result)
 
+# Demand forecasting
+forecast = forecast_demand(daily_sales, periods=7)
 
-# 8. Product-wise analysis
-print("\n===== PRODUCT ANALYSIS =====")
-print(sales_by_product(df))
+print("\n7-Day Demand Forecast:")
+print(forecast)
 
+print("\nForecast Summary:")
+print(f"Average predicted demand: {forecast['forecast_sales'].mean():.2f}")
+print(f"Minimum predicted demand: {forecast['forecast_sales'].min():.2f}")
+print(f"Maximum predicted demand: {forecast['forecast_sales'].max():.2f}")
 
-# 9. Promotion analysis
-print("\n===== PROMOTION ANALYSIS =====")
-print(promotion_analysis(df))
+# Visualize forecast
+plot_forecast(daily_sales, forecast)
 
-
-# 10. Price analysis
-print("\n===== PRICE ANALYSIS =====")
-print(price_analysis(df))
-
-
-print("\n===== PROGRAM COMPLETED SUCCESSFULLY =====")
-print("\n===== GENERATING GRAPHS =====")
-
-sales_trend(df)
-
-product_sales(df)
-
-promotion_sales(df)
-
-price_sales(df)
+print("\n" + "=" * 50)
+print("ANALYSIS COMPLETE")
+print("=" * 50)
